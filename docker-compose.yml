@@ -1,66 +1,79 @@
-version: "3.9"
-
+---
 services:
   traefik:
-    container_name: traefik
-    image: "traefik:latest"
-    restart: always
+    image: traefik:latest
     command:
-      - --api
-      - --api.dashboard=true
-      - --api.debug=true
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --providers.docker
-      - --log.level=DEBUG
-      - --accesslog=true
-      - --certificatesresolvers.leresolver.acme.httpchallenge=true
-      - --certificatesresolvers.leresolver.acme.email=ryan.draga@boxingoctop.us
-      - --certificatesresolvers.leresolver.acme.storage=./acme.json
-      - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
+      - "--ping=true"
+      - "--accesslog=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=shared-network"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.ping.address=:8082"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--ping.entrypoint=ping"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=ryan.draga@dragonspurr.ca"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=DEBUG"
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      shared-network:
+        ipv4_address: 10.0.0.2
+    restart: always
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/mnt/portainer_int_db_01/traefik/acme.json:/acme.json"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-data:/letsencrypt
     labels:
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.boxingoctopus.io`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=traefik:$$2a$$12$$pl4SEojIAPM6TjCYaRdsBu5srgQJ6.OGqeDzyzZJl7Utvv0k2qpCm"
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=traefik:$$apr1$$W2zaquVg$$qelXtEd2ug5qyEbufJ1Bb1"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.dragonspurr.ca`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8082/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   portainer:
     image: portainer/portainer-ee:latest
     command: -H unix:///var/run/docker.sock
     restart: always
+    networks:
+      shared-network:
+        ipv4_address: 10.0.0.3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     labels:
-      # Frontend
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`portainer.boxingoctopus.io`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.services.frontend.loadbalancer.server.port=9000"
-      - "traefik.http.routers.frontend.service=frontend"
-      - "traefik.http.routers.frontend.tls.certresolver=leresolver"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.dragonspurr.ca`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.service=portainer"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
-      # Edge
-      - "traefik.http.routers.edge.rule=Host(`edge.boxingoctopus.io`)"
-      - "traefik.http.routers.edge.entrypoints=websecure"
-      - "traefik.http.services.edge.loadbalancer.server.port=8000"
-      - "traefik.http.routers.edge.service=edge"
-      - "traefik.http.routers.edge.tls.certresolver=leresolver"
+networks:
+  shared-network:
+    name: shared-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+          gateway: 10.0.0.1
 
 volumes:
   portainer_data:
-
-networks:
-  default:
-    external: true
-    name: portainer_default
+  traefik-data:
