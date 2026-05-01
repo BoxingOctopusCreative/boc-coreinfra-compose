@@ -1,4 +1,5 @@
 ---
+name: portainer-yml
 services:
   socket-proxy-readonly:
     image: lscr.io/linuxserver/socket-proxy:latest
@@ -41,6 +42,37 @@ services:
     networks:
       - socket-proxy-portainer
 
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    restart: unless-stopped
+    networks:
+      shared-network:
+        ipv4_address: 10.0.0.5
+    volumes:
+      - /mnt/portainer_ext_vol_01/authelia:/config
+    environment:
+      AUTHELIA_JWT_SECRET_FILE: /config/secrets/jwt_secret
+      AUTHELIA_SESSION_SECRET_FILE: /config/secrets/session_secret
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /config/secrets/storage_encryption_key
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`auth.boxingoctopus.io`)"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.tls.certresolver=leresolver"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      # Define the forwardauth middleware here, once, for everything to reference
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.boxingoctopus.io"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+      - "wud.trigger.include="
+    healthcheck:
+      test: ["CMD", "wget", "-nv", "-t1", "--spider", "http://localhost:9091/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
   traefik:
     container_name: traefik
     image: "traefik:latest"
@@ -79,8 +111,7 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`traefik.boxingoctopus.io`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=traefik:$2y$05$xs4VJ8fJGLPY2W8/RgtU1ejVi0kuOYkdmDcE5MBMh46MqzlWdJ3pO"
+      - "traefik.http.routers.dashboard.middlewares=authelia@docker"
       - "wud.trigger.include="
     healthcheck:
       test: ["CMD", "wget", "-nv", "-t1", "--spider", "http://localhost:8082/ping"]
@@ -98,7 +129,7 @@ services:
       shared-network:
         ipv4_address: 10.0.0.3
     volumes:
-      - /mnt/portainer_int_db_01/portainer:/data
+      - /mnt/portainer_ext_vol_01/portainer:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`portainer.boxingoctopus.io`)"
@@ -134,6 +165,7 @@ services:
       - "traefik.http.services.wud.loadbalancer.server.port=3000"
       - "traefik.http.routers.wud.service=wud"
       - "traefik.http.routers.wud.tls.certresolver=leresolver"
+      - "traefik.http.routers.wud.middlewares=authelia@docker"
       - "wud.trigger.include="
     healthcheck:
       test: curl --fail http://localhost:${WUD_SERVER_PORT:-3000}/health || exit 1
