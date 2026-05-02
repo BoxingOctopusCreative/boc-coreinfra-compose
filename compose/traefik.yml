@@ -14,6 +14,7 @@ services:
           memory: 128M
     command:
       - --api=true
+      - --api.dashboard=true
       - --ping=true
       - --ping.entrypoint=ping
       - --entrypoints.ping.address=:8082
@@ -43,6 +44,8 @@ services:
       traefik.http.routers.http-catchall.entrypoints: "web"
       traefik.http.routers.http-catchall.middlewares: "redirect-to-https"
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"
+      traefik.http.routers.dashboard.tls: "true"
+      traefik.http.routers.dashboard.tls.certresolver: "leresolver"
       traefik.http.routers.dashboard.rule: "Host(`traefik.boxingoctopus.io`)"
       traefik.http.routers.dashboard.service: "api@internal"
       traefik.http.routers.dashboard.entrypoints: "websecure"
