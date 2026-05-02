@@ -1,11 +1,17 @@
 # boc-coreinfra-compose
 Core Infrastructure Compose for Boxing Octopus Creative Services
 
+## Introduction
+
+* Core services for Boxing Octopus Creative
+* All services served on subdomains under `boxingoctopus.io`
+
 ## Services
 
 ### [Traefik](https://traefik.io/traefik)
 
 * Frontend Proxy
+* Dashboard located @ https://traefik.boxingoctopus.io
 * Authenticated by Authelia
 * Service defined in [compose/traefik.yaml](./compose/traefik.yaml)
 
