@@ -14,7 +14,6 @@ services:
           memory: 128M
     command:
       - --api=true
-      - --api.insecure=true
       - --ping=true
       - --ping.entrypoint=ping
       - --entrypoints.ping.address=:8082
@@ -45,10 +44,10 @@ services:
       traefik.http.routers.http-catchall.entrypoints: "web"
       traefik.http.routers.http-catchall.middlewares: "redirect-to-https"
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"
-      traefik.http.routers.dashboard.rule: "Host(`traefik.boxingoctopus.io`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      traefik.http.routers.dashboard.rule: "Host(`traefik.boxingoctopus.io`)"
       traefik.http.routers.dashboard.service: "api@internal"
       traefik.http.routers.dashboard.entrypoints: "websecure"
-      traefik.http.routers.dashboard.middlewares: 
+      traefik.http.routers.dashboard.middlewares: "authelia@docker"
       wud.trigger.include: ""
     healthcheck:
       test: ["CMD", "wget", "-nv", "-t1", "--spider", "http://localhost:8082/ping"]
