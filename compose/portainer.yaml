@@ -1,0 +1,40 @@
+---
+services:
+  portainer:
+    image: portainer/portainer-ee:latest
+    container_name: portainer
+    command: -H tcp://socket-proxy-portainer:2375
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      socket-proxy-portainer:
+      shared-network:
+        ipv4_address: 10.0.0.3
+    volumes:
+      - /mnt/portainer_ext_vol_01/portainer:/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.portainer.rule: "Host(`portainer.boxingoctopus.io`)"
+      traefik.http.routers.portainer.entrypoints: "websecure"
+      traefik.http.services.portainer.loadbalancer.server.port: "9000"
+      traefik.http.routers.portainer.service: "portainer"
+      traefik.http.routers.portainer.tls.certresolver: "leresolver"
+      wud.trigger.include: ""
+    healthcheck:
+      test: ["CMD", "/portainer", "--version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  socket-proxy-portainer:
+    external: true
+  shared-network:
+    external: true

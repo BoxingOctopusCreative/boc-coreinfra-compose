@@ -1,0 +1,53 @@
+---
+x-socket-proxy-base: &socket-proxy-base
+  image: lscr.io/linuxserver/socket-proxy:latest
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /run
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+  deploy:
+    resources:
+      limits:
+        cpus: '0.25'
+        memory: 64M
+      reservations:
+        cpus: '0.10'
+        memory: 32M
+
+services:
+  socket-proxy-readonly:
+    <<: *socket-proxy-base
+    container_name: socket-proxy-readonly
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      DISTRIBUTION: 1
+      POST: 1
+    networks:
+      - socket-proxy-readonly
+
+  socket-proxy-portainer:
+    <<: *socket-proxy-base
+    container_name: socket-proxy-portainer
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      DISTRIBUTION: 1
+      INFO: 1
+      NETWORKS: 1
+      VOLUMES: 1
+      EXEC: 1
+      POST: 1
+      ALLOW_START: 1
+      ALLOW_STOP: 1
+      ALLOW_RESTARTS: 1
+    networks:
+      - socket-proxy-portainer
+
+networks:
+  socket-proxy-readonly:
+    internal: true
+  socket-proxy-portainer:
+    internal: true

@@ -1,0 +1,62 @@
+---
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    command:
+      - --ping=true
+      - --ping.entrypoint=ping
+      - --entrypoints.ping.address=:8082
+      - --api.dashboard=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker.endpoint=tcp://socket-proxy-readonly:2375
+      - --providers.docker.exposedbydefault=false
+      - --log.level=ERROR
+      - --accesslog=true
+      - --certificatesresolvers.leresolver.acme.httpchallenge=true
+      - --certificatesresolvers.leresolver.acme.email=ryan.draga@boxingoctop.us
+      - --certificatesresolvers.leresolver.acme.storage=/acme.json
+      - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8082:8082"
+    networks:
+      socket-proxy-readonly:
+      shared-network:
+        ipv4_address: 10.0.0.2
+    volumes:
+      - /mnt/portainer_ext_vol_01/traefik/acme.json:/acme.json
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.http-catchall.rule: "hostregexp(`{host:.+}`)"
+      traefik.http.routers.http-catchall.entrypoints: "web"
+      traefik.http.routers.http-catchall.middlewares: "redirect-to-https"
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: "https"
+      traefik.http.routers.dashboard.rule: "Host(`traefik.boxingoctopus.io`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      traefik.http.routers.dashboard.service: "api@internal"
+      traefik.http.routers.dashboard.entrypoints: "websecure"
+      traefik.http.routers.dashboard.middlewares: "authelia@docker"
+      wud.trigger.include: ""
+    healthcheck:
+      test: ["CMD", "wget", "-nv", "-t1", "--spider", "http://localhost:8082/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  socket-proxy-readonly:
+    external: true
+  shared-network:
+    external: true

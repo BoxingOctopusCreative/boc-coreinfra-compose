@@ -1,0 +1,46 @@
+---
+services:
+  whatsupdocker:
+    image: getwud/wud:latest
+    container_name: wud
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+    networks:
+      socket-proxy-readonly:
+      shared-network:
+        ipv4_address: 10.0.0.4
+    volumes:
+      - /mnt/portainer_ext_vol_01/wud:/store
+    environment:
+      DOCKER_HOST: tcp://socket-proxy-readonly:2375
+      WUD_AUTH_BASIC_ADMIN_USER: $WUD_ADMIN_USERNAME
+      WUD_AUTH_BASIC_ADMIN_HASH: $WUD_ADMIN_PASSWORD_HASH
+      WUD_TRIGGER_DISCORD_BOC_INFRA_ALERTS_URL: $DISCORD_WEBHOOK_URL
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.wud.rule: "Host(`wud.boxingoctopus.io`)"
+      traefik.http.routers.wud.entrypoints: "websecure"
+      traefik.http.services.wud.loadbalancer.server.port: "3000"
+      traefik.http.routers.wud.service: "wud"
+      traefik.http.routers.wud.tls.certresolver: "leresolver"
+      traefik.http.routers.wud.middlewares: "authelia@docker"
+      wud.trigger.include: ""
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  socket-proxy-readonly:
+    external: true
+  shared-network:
+    external: true
