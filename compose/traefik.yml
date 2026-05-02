@@ -17,7 +17,6 @@ services:
       - --ping=true
       - --ping.entrypoint=ping
       - --entrypoints.ping.address=:8082
-      - --api.dashboard=true
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --providers.docker.endpoint=tcp://socket-proxy-readonly:2375
