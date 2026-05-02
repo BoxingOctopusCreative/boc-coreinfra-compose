@@ -48,6 +48,9 @@ services:
 
 networks:
   socket-proxy-readonly:
-    internal: true
+    external: true
   socket-proxy-portainer:
-    internal: true
+    external: true
+  shared-network:
+    name: shared-network
+    external: true
