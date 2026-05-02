@@ -21,6 +21,7 @@ services:
       - /mnt/portainer_ext_vol_01/portainer:/data
     labels:
       traefik.enable: "true"
+      traefik.docker.network: "shared-network"
       traefik.http.routers.portainer.rule: "Host(`portainer.boxingoctopus.io`)"
       traefik.http.routers.portainer.entrypoints: "websecure"
       traefik.http.services.portainer.loadbalancer.server.port: "9000"
