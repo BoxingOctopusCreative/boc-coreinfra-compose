@@ -20,8 +20,10 @@ services:
       - /mnt/portainer_ext_vol_01/wud:/store
     environment:
       DOCKER_HOST: tcp://socket-proxy-readonly:2375
-      WUD_AUTH_BASIC_ADMIN_USER: $WUD_ADMIN_USERNAME
-      WUD_AUTH_BASIC_ADMIN_HASH: $WUD_ADMIN_PASSWORD_HASH
+      WUD_AUTH_OIDC_AUTHELIA_CLIENTID: wud
+      WUD_AUTH_OIDC_AUTHELIA_CLIENTSECRET: $WUD_OIDC_CLIENT_SECRET
+      WUD_AUTH_OIDC_AUTHELIA_DISCOVERY: https://auth.boxingoctopus.io/.well-known/openid-configuration
+      WUD_AUTH_OIDC_AUTHELIA_REDIRECT: https://wud.boxingoctopus.io/auth/oidc/authelia/callback
       WUD_TRIGGER_DISCORD_BOCINFRAALERTS_URL: $DISCORD_WEBHOOK_URL
       WUD_REGISTRY_GHCR_PRIVATE_USERNAME: $WUD_GHCR_USERNAME
       WUD_REGISTRY_GHCR_PRIVATE_TOKEN: $WUD_GHCR_TOKEN
@@ -32,7 +34,7 @@ services:
       traefik.http.services.wud.loadbalancer.server.port: "3000"
       traefik.http.routers.wud.service: "wud"
       traefik.http.routers.wud.tls.certresolver: "leresolver"
-      traefik.http.routers.wud.middlewares: "authelia@docker"
+      #traefik.http.routers.wud.middlewares: "authelia@docker"
       wud.trigger.include: ""
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:3000/health"]
