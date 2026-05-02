@@ -16,7 +16,7 @@ services:
       shared-network:
         ipv4_address: 10.0.0.5
     volumes:
-      - /mnt/portainer_ext_vol_01/boc-coreinfra-compose/authelia:/config
+      - /mnt/portainer_ext_vol_01/boc-coreinfra-compose/authelia/configuration.yml:/config/configuration.yml:ro
       - /mnt/portainer_ext_vol_01/authelia/secrets:/config/secrets
       - /mnt/portainer_ext_vol_01/authelia/database:/config/database
       - /mnt/portainer_ext_vol_01/authelia/users:/config/users
