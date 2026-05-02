@@ -1,0 +1,89 @@
+server:
+  address: tcp://0.0.0.0:9091
+
+log:
+  level: warn
+
+theme: dark
+
+default_redirection_url: https://auth.boxingoctopus.io
+
+totp:
+  issuer: boxingoctopus.io
+  period: 30
+  skew: 1
+
+identity_validation:
+  reset_password:
+    jwt_secret: /config/secrets/jwt_secret
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2id
+      iterations: 1
+      salt_length: 16
+      parallelism: 8
+      memory: 64
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: auth.boxingoctopus.io
+      policy: bypass
+    - domain: traefik.boxingoctopus.io
+      policy: two_factor
+    - domain: wud.boxingoctopus.io
+      policy: bypass  # WUD handles its own auth via OIDC now
+
+session:
+  name: authelia_session
+  expiration: 3600
+  inactivity: 300
+  cookies:
+    - domain: boxingoctopus.io
+      authelia_url: https://auth.boxingoctopus.io
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  smtp:
+    address: smtp://smtp.mailgun.org:587
+    username: postmaster@boxingoctopus.io
+    sender: authelia@boxingoctopus.io
+    subject: "[Authelia] {title}"
+
+identity_providers:
+  oidc:
+    hmac_secret: /config/secrets/oidc_hmac_secret
+    jwks:
+      - key_id: default
+        algorithm: RS256
+        use: sig
+        key: /config/secrets/oidc_private_key
+    lifespans:
+      access_token: 1h
+      authorize_code: 1m
+      id_token: 1h
+      refresh_token: 90m
+    clients:
+      - client_id: wud
+        client_name: What's Up Docker
+        client_secret: /config/secrets/wud_oidc_secret
+        public: false
+        authorization_policy: two_factor
+        redirect_uris:
+          - https://wud.boxingoctopus.io/auth/oidc/authelia/callback
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        grant_types:
+          - authorization_code
+        response_types:
+          - code
+        token_endpoint_auth_method: client_secret_basic
