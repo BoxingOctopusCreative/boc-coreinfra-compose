@@ -52,8 +52,8 @@ storage:
 notifier:
   smtp:
     address: smtp://smtp.mailgun.org:587
-    username: postmaster@boxingoctopus.io
-    sender: authelia@boxingoctopus.io
+    username: authelia@mg.boxingoctopus.io
+    sender: authelia@mg.boxingoctopus.io
     subject: "[Authelia] {title}"
 
 identity_providers:
