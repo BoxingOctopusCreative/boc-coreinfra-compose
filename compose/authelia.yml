@@ -24,8 +24,7 @@ services:
       AUTHELIA_SESSION_SECRET_FILE: /config/secrets/session_secret
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /config/secrets/storage_encryption_key
       AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /config/secrets/smtp_password
-      AUTHELIA_IDENTITY_PROVIDERS_OIDC_JWKS_0_KEY_FILE: /config/secrets/oidc_private_key
-      AUTHELIA_IDENTITY_PROVIDERS_OIDC_CLIENTS_0_CLIENT_SECRET_FILE: /config/secrets/wud_oidc_secret
+      X_AUTHELIA_CONFIG_FILTERS: template
     labels:
       traefik.enable: "true"
       traefik.http.routers.authelia.rule: "Host(`auth.boxingoctopus.io`)"
