@@ -53,6 +53,7 @@ notifier:
   smtp:
     address: smtp://smtp.mailgun.org:587
     username: authelia@mg.boxingoctopus.io
+    password: {{ secret "/config/secrets/smtp_password" | msquote }}
     sender: authelia@mg.boxingoctopus.io
     subject: "[Authelia] {title}"
 

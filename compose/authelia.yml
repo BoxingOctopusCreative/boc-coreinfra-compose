@@ -22,7 +22,7 @@ services:
       - /mnt/portainer_ext_vol_01/authelia/users:/config/users
     environment:
       AUTHELIA_SESSION_SECRET_FILE: /config/secrets/session_secret
-      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /config/secrets/smtp_password
+      #AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /config/secrets/smtp_password
       X_AUTHELIA_CONFIG_FILTERS: template
     labels:
       traefik.enable: "true"
