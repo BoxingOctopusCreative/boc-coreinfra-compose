@@ -17,7 +17,7 @@ identity_validation:
 
 authentication_backend:
   file:
-    path: /config/users_database.yml
+    path: /config/users/users_database.yml
     password:
       algorithm: argon2id
       iterations: 1
@@ -46,7 +46,7 @@ session:
 
 storage:
   local:
-    path: /config/db.sqlite3
+    path: /config/database/db.sqlite3
 
 notifier:
   smtp:
