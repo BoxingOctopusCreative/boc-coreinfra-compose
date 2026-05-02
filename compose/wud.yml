@@ -22,7 +22,7 @@ services:
       DOCKER_HOST: tcp://socket-proxy-readonly:2375
       WUD_AUTH_BASIC_ADMIN_USER: $WUD_ADMIN_USERNAME
       WUD_AUTH_BASIC_ADMIN_HASH: $WUD_ADMIN_PASSWORD_HASH
-      WUD_TRIGGER_DISCORD_boc_infra_alerts_URL: $DISCORD_WEBHOOK_URL
+      WUD_TRIGGER_DISCORD_BOCINFRAALERTS_URL: $DISCORD_WEBHOOK_URL
     labels:
       traefik.enable: "true"
       traefik.http.routers.wud.rule: "Host(`wud.boxingoctopus.io`)"
