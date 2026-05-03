@@ -19,11 +19,10 @@ services:
     volumes:
       - /mnt/portainer_ext_vol_01/wud:/store
     environment:
-      DOCKER_HOST: tcp://socket-proxy-readonly:2375
       WUD_AUTH_OIDC_AUTHELIA_CLIENTID: wud
       WUD_AUTH_OIDC_AUTHELIA_CLIENTSECRET: $WUD_OIDC_CLIENT_SECRET
       WUD_AUTH_OIDC_AUTHELIA_DISCOVERY: https://auth.boxingoctopus.io/.well-known/openid-configuration
-      WUD_AUTH_OIDC_AUTHELIA_REDIRECT: https://wud.boxingoctopus.io/auth/oidc/authelia/callback
+      WUD_AUTH_OIDC_AUTHELIA_REDIRECT: "true"
       WUD_TRIGGER_DISCORD_BOCINFRAALERTS_URL: $DISCORD_WEBHOOK_URL
       WUD_REGISTRY_GHCR_PRIVATE_USERNAME: $WUD_GHCR_USERNAME
       WUD_REGISTRY_GHCR_PRIVATE_TOKEN: $WUD_GHCR_TOKEN
