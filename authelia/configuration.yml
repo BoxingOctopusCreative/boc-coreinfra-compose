@@ -56,6 +56,10 @@ notifier:
     password: {{ secret "/config/secrets/smtp_password" | msquote }}
     sender: authelia@mg.boxingoctopus.io
     subject: "[Authelia] {title}"
+    tls:
+      server_name: smtp.mailgun.org
+      skip_verify: false
+      minimum_version: TLS1.2
 
 identity_providers:
   oidc:
