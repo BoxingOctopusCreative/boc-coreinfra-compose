@@ -15,6 +15,12 @@ x-socket-proxy-base: &socket-proxy-base
       reservations:
         cpus: '0.10'
         memory: 32M
+  healthcheck:
+    test: nc -vvz localhost 2375
+    interval: 10s
+    timeout: 10s
+    retries: 3
+    start_period: 10s
 
 services:
   socket-proxy-readonly:
@@ -24,6 +30,8 @@ services:
       CONTAINERS: 1
       IMAGES: 1
       DISTRIBUTION: 1
+      EVENTS: 1
+      INFO: 1
       POST: 1
     networks:
       - socket-proxy-readonly
