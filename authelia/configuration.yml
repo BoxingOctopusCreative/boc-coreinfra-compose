@@ -93,11 +93,10 @@ identity_providers:
           - email
           - groups
         grant_types:
-          - refresh_token
           - authorization_code
         response_types:
           - code
-        token_endpoint_auth_method: client_secret_basic
+        token_endpoint_auth_method: client_secret_post
       - client_id: wud
         client_name: What's Up Docker
         client_secret: {{ secret "/config/secrets/wud_oidc_secret" | msquote }}
@@ -111,7 +110,6 @@ identity_providers:
           - email
           - groups
         grant_types:
-          - refresh_token
           - authorization_code
         response_types:
           - code
