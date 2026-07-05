@@ -13,19 +13,21 @@ services:
           cpus: '0.10'
           memory: 128M
     networks:
-      socket-proxy-readonly:
+      socket-proxy-portainer:
       shared-network:
         ipv4_address: 10.0.0.4
     volumes:
       - /mnt/portainer_ext_vol_01/wud:/store
     environment:
-      WUD_WATCHER_LOCAL_HOST: socket-proxy-readonly
+      WUD_WATCHER_LOCAL_HOST: socket-proxy-portainer
       WUD_WATCHER_LOCAL_PORT: 2375
       WUD_AUTH_OIDC_AUTHELIA_CLIENTID: wud
       WUD_AUTH_OIDC_AUTHELIA_CLIENTSECRET: $WUD_OIDC_CLIENT_SECRET
       WUD_AUTH_OIDC_AUTHELIA_DISCOVERY: https://auth.boxingoctopus.io/.well-known/openid-configuration
       WUD_AUTH_OIDC_AUTHELIA_REDIRECT: "true"
       WUD_TRIGGER_DISCORD_BOCINFRAALERTS_URL: $DISCORD_WEBHOOK_URL
+      WUD_TRIGGER_DOCKER_AUTOUPDATE_AUTO: "true"
+      WUD_TRIGGER_DOCKER_AUTOUPDATE_PRUNE: "true"
       WUD_REGISTRY_GHCR_PRIVATE_USERNAME: $WUD_GHCR_USERNAME
       WUD_REGISTRY_GHCR_PRIVATE_TOKEN: $WUD_GHCR_TOKEN
     labels:
@@ -35,7 +37,6 @@ services:
       traefik.http.services.wud.loadbalancer.server.port: "3000"
       traefik.http.routers.wud.service: "wud"
       traefik.http.routers.wud.tls.certresolver: "leresolver"
-      #traefik.http.routers.wud.middlewares: "authelia@docker"
       wud.trigger.include: ""
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:3000/health"]
@@ -45,7 +46,7 @@ services:
       start_period: 10s
 
 networks:
-  socket-proxy-readonly:
+  socket-proxy-portainer:
     external: true
   shared-network:
     external: true
