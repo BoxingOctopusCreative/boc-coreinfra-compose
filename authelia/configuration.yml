@@ -71,7 +71,33 @@ identity_providers:
       authorize_code: 1m
       id_token: 1h
       refresh_token: 90m
+    claims_policies:
+      portainer:
+        id_token:
+          - groups
+          - email
+          - email_verified
+          - preferred_username
+          - name
     clients:
+      - client_id: portainer
+        client_name: Portainer
+        client_secret: {{ secret "/config/secrets/portainer_oidc_secret" | msquote }}
+        public: false
+        authorization_policy: two_factor
+        redirect_uris:
+          - https://portainer.boxingoctopus.io/
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        grant_types:
+          - refresh_token
+          - authorization_code
+        response_types:
+          - code
+        token_endpoint_auth_method: client_secret_basic
       - client_id: wud
         client_name: What's Up Docker
         client_secret: {{ secret "/config/secrets/wud_oidc_secret" | msquote }}
