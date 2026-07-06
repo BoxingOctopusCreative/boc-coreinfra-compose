@@ -2,7 +2,7 @@
 x-socket-proxy-base: &socket-proxy-base
   image: lscr.io/linuxserver/socket-proxy:latest
   restart: unless-stopped
-  read_only: true
+  expose: 2375
   tmpfs:
     - /run
   volumes:
@@ -26,6 +26,7 @@ services:
   socket-proxy-readonly:
     <<: *socket-proxy-base
     container_name: socket-proxy-readonly
+    read_only: true
     environment:
       CONTAINERS: 1
       IMAGES: 1
