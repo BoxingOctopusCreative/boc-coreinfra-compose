@@ -34,7 +34,6 @@ services:
       DISTRIBUTION: 1
       EVENTS: 1
       INFO: 1
-      POST: 1
     networks:
       - socket-proxy-readonly
 

@@ -16,7 +16,7 @@ services:
         target: /etc/vector/vector.yaml
     command: ["--config", "/etc/vector/vector.yaml"]
     networks:
-      - socket-proxy-portainer
+      - socket-proxy-readonly
       - default
     labels:
       - wud.watch=true
@@ -27,7 +27,7 @@ volumes:
   vector_data:
 
 networks:
-  socket-proxy-portainer:
+  socket-proxy-readonly:
     external: true
 
 configs:
@@ -38,7 +38,7 @@ configs:
       sources:
         docker:
           type: docker_logs
-          docker_host: tcp://socket-proxy-portainer:2375   # <-- proxy service name + port
+          docker_host: http://socket-proxy-readonly:2375   # <-- proxy service name + port
           exclude_containers:
             - vector
 
