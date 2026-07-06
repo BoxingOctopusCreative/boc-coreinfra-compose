@@ -38,7 +38,7 @@ configs:
       sources:
         docker:
           type: docker_logs
-          docker_host: tcp://socket-proxy:2375   # <-- proxy service name + port
+          docker_host: tcp://socket-proxy-portainer:2375   # <-- proxy service name + port
           exclude_containers:
             - vector
 
