@@ -2,7 +2,8 @@
 x-socket-proxy-base: &socket-proxy-base
   image: lscr.io/linuxserver/socket-proxy:latest
   restart: unless-stopped
-  expose: 2375
+  expose: 
+    - 2375
   tmpfs:
     - /run
   volumes:
