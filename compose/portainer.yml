@@ -1,7 +1,7 @@
 ---
 services:
   portainer:
-    image: portainer/portainer-ee:latest
+    image: portainer/portainer-ee:2.43.0
     container_name: portainer
     command: -H tcp://socket-proxy-portainer:2375
     restart: always
