@@ -1,6 +1,6 @@
 ---
 x-socket-proxy-base: &socket-proxy-base
-  image: lscr.io/linuxserver/socket-proxy:latest
+  image: linuxserver/socket-proxy:latest
   restart: unless-stopped
   expose: 
     - 2375
