@@ -72,45 +72,14 @@ identity_providers:
       id_token: 1h
       refresh_token: 90m
     claims_policies:
-      portainer:
-        id_token:
-          - groups
-          - email
-          - email_verified
-          - preferred_username
-          - name
+    {{- range $file := glob "/config/policies/*.yml" }}
+      {{- with (index (fileContent $file | fromYaml) "oidc_client") }}
+      {{- . | toYaml | nindent 6 }}
+      {{- end }}
+    {{- end }}
     clients:
-      - client_id: portainer
-        client_name: Portainer
-        client_secret: {{ secret "/config/secrets/portainer_oidc_secret" | msquote }}
-        public: false
-        authorization_policy: two_factor
-        redirect_uris:
-          - https://portainer.boxingoctopus.io/
-        scopes:
-          - openid
-          - profile
-          - email
-          - groups
-        grant_types:
-          - authorization_code
-        response_types:
-          - code
-        token_endpoint_auth_method: client_secret_post
-      - client_id: wud
-        client_name: What's Up Docker
-        client_secret: {{ secret "/config/secrets/wud_oidc_secret" | msquote }}
-        public: false
-        authorization_policy: two_factor
-        redirect_uris:
-          - https://wud.boxingoctopus.io/auth/oidc/authelia/cb
-        scopes:
-          - openid
-          - profile
-          - email
-          - groups
-        grant_types:
-          - authorization_code
-        response_types:
-          - code
-        token_endpoint_auth_method: client_secret_basic
+    {{- range $file := glob "/config/apps/*.yml" }}
+      {{- with (index (fileContent $file | fromYaml) "oidc_client") }}
+      {{- . | toYaml | nindent 6 }}
+      {{- end }}
+    {{- end }}

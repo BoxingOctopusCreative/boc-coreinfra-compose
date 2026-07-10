@@ -1,7 +1,7 @@
 ---
 services:
   valkey:
-    container_name: valkey
+    container_name: coreinfra-valkey
     image: valkey/valkey:8-alpine
     networks:
       shared-network:
@@ -12,7 +12,10 @@ services:
     configs:
       - source: valkey-config
         target: /usr/local/etc/valkey/valkey.conf
+      - source: valkey-acl
+        target: /usr/local/etc/valkey/users.acl
     environment:
+      VALKEY_USERNAME: $VALKEY_USERNAME
       VALKEY_PASSWORD: $VALKEY_PASSWORD
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
@@ -33,9 +36,14 @@ configs:
     content: |
       save 60 1
       loglevel warning
-      requirepass ${VALKEY_PASSWORD}
+      aclfile /usr/local/etc/valkey/users.acl
       bind 0.0.0.0
       port 6379
+  valkey-acl:
+    content: |
+      user default off
+      user $VALKEY_USERNAME on >${VALKEY_PASSWORD} allcommands allkeys
+ 
 
 networks:
   shared-network:

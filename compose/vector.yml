@@ -7,8 +7,8 @@ services:
     environment:
       VECTOR_LOG: debug
       AXIOM_TOKEN: ${AXIOM_TOKEN}
-      AXIOM_DATASET: ${AXIOM_DATASET}
-      # AXIOM_ORG_ID: ${AXIOM_ORG_ID}   # only needed if a personal token complains
+      AXIOM_DATASET: portainer
+      AXIOM_ORG_ID: boc-engineering-vvyp
     volumes:
       - /var/log:/var/log/host:ro
       - vector_data:/var/lib/vector
