@@ -6,8 +6,8 @@ services:
     networks:
       shared-network:
         ipv4_address: 10.0.0.6
-    expose:
-      - "6379"
+    ports:
+      - "6379:6379"
     command: ["valkey-server", "--save", "60", "1", "--loglevel", "warning"]
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
