@@ -8,7 +8,12 @@ services:
         ipv4_address: 10.0.0.6
     ports:
       - "6379:6379"
-    command: ["valkey-server", "--save", "60", "1", "--loglevel", "warning"]
+    command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
+    configs:
+      - source: valkey-config
+        target: /usr/local/etc/valkey/valkey.conf
+    environment:
+      VALKEY_PASSWORD: $VALKEY_PASSWORD
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 10s
@@ -20,3 +25,18 @@ services:
       - wud.watch=true
       - wud.tag.include=^\d+\.\d+\.\d+$      # only track real semver tags
       - wud.trigger.include=docker.autoupdate
+    volumes:
+      - /mnt/portainer_ext_vol_01/valkey/data:/data
+
+configs:
+  valkey-config:
+    content: |
+      save 60 1
+      loglevel warning
+      requirepass ${VALKEY_PASSWORD}
+      bind 0.0.0.0
+      port 6379
+
+networks:
+  shared-network:
+    external: true
