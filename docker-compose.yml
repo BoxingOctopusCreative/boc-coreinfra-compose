@@ -7,3 +7,4 @@ include:
   - compose/portainer.yml
   - compose/wud.yml
   - compose/vector.yml
+  - compose/valkey.yml
