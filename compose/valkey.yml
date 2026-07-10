@@ -42,7 +42,7 @@ configs:
   valkey-acl:
     content: |
       user default off
-      user $VALKEY_USERNAME on >${VALKEY_PASSWORD} allcommands allkeys
+      user $VALKEY_USERNAME on >${VALKEY_PASSWORD} allcommands allkeys allchannels
  
 
 networks:
