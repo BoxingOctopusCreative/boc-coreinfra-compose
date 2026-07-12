@@ -25,9 +25,9 @@ services:
       start_period: 5s
     restart: unless-stopped
     labels:
-      - wud.watch=true
-      - wud.tag.include=^\d+\.\d+\.\d+$      # only track real semver tags
-      - wud.trigger.include=docker.autoupdate
+      wud.watch: true
+      wud.tag.include: "^\\d+\\.\\d+\\.\\d+$"      # only track real semver tags
+      wud.trigger.include: "docker.autoupdate"
     volumes:
       - /mnt/portainer_ext_vol_01/valkey/data:/data
 

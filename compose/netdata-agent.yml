@@ -1,0 +1,64 @@
+version: '3'
+services:
+  netdata:
+    image: netdata/netdata
+    ports:
+      - 19999:19999
+    container_name: netdata
+    pid: host
+    network_mode: host
+    networks:
+      shared-network:
+        ipv4_address: 10.0.0.7
+    restart: unless-stopped
+    configs:
+      - source: netdata-config
+        target: /etc/netdata/netdata.conf
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /:/host/root:ro,rslave
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/log:/host/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/dbus:/run/dbus:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.netdata.rule: "Host(`ndagent.boxingoctopus.io`)"
+      traefik.http.routers.netdata.entrypoints: "websecure"
+      traefik.http.services.netdata.loadbalancer.server.port: "19999"
+      traefik.http.routers.netdata.service: "netdata"
+      traefik.http.routers.netdata.tls.certresolver: "leresolver"
+      wud.watch: true
+      wud.tag.include: "^\\d+\\.\\d+\\.\\d+$"      # only track real semver tags
+      wud.trigger.include: "docker.autoupdate"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:19999/api/v1/info"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  volumes:
+    netdatalib:
+    netdatacache:
+
+configs:
+  netdata-config:
+    content: |
+      [web]
+        bearer token protection = yes
+
+networks:
+  shared-network:
+    external: true
