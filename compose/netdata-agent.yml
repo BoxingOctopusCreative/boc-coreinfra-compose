@@ -2,8 +2,6 @@ version: '3'
 services:
   netdata:
     image: netdata/netdata
-    ports:
-      - 19999:19999
     container_name: netdata
     pid: host
     networks:
@@ -38,6 +36,7 @@ services:
       traefik.http.services.netdata.loadbalancer.server.port: "19999"
       traefik.http.routers.netdata.service: "netdata"
       traefik.http.routers.netdata.tls.certresolver: "leresolver"
+      traefik.http.routers.netdata.middlewares: "authelia@docker"
       wud.watch: true
       wud.tag.include: "^\\d+\\.\\d+\\.\\d+$"      # only track real semver tags
       wud.trigger.include: "docker.autoupdate"
