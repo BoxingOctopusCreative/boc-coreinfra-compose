@@ -49,9 +49,9 @@ services:
       retries: 5
       start_period: 5s
 
-  volumes:
-    netdatalib:
-    netdatacache:
+volumes:
+  netdatalib:
+  netdatacache:
 
 configs:
   netdata-config:
