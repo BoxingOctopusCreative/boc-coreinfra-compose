@@ -6,7 +6,6 @@ services:
       - 19999:19999
     container_name: netdata
     pid: host
-    network_mode: host
     networks:
       shared-network:
         ipv4_address: 10.0.0.7
