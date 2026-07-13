@@ -1,7 +1,0 @@
-portainer:
-  id_token:
-    - groups
-    - email
-    - email_verified
-    - preferred_username
-    - name
