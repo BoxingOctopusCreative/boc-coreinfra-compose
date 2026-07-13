@@ -5,6 +5,8 @@ services:
     container_name: portainer
     command: -H tcp://socket-proxy-portainer:2375
     restart: always
+    environment:
+      - GODEBUG=netdns=go+4 # Disable IPv6 lookups
     deploy:
       resources:
         limits:
