@@ -9,14 +9,14 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
     environment:
       - GODEBUG=netdns=go+4 # Disable IPv6 lookups
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.50'
+    #       memory: 256M
+    #     reservations:
+    #       cpus: '0.25'
+    #       memory: 128M
     networks:
       socket-proxy-portainer:
       shared-network:
